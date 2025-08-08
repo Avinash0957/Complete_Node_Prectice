@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .sidebar, .main-content, .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Left Sidebar - Total Posts */
+        .sidebar {
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .stats-card {
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .stats-number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-label {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Main Content - Posts */
+        .main-content {
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .posts-grid {
+            display: grid;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .post-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            transition: all 0.5s ease;
+        }
+
+        .post-card:hover::before {
+            left: 100%;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .post-excerpt {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .read-more {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Right Form Section */
+        .form-section {
+            padding: 30px 25px;
+            overflow-y: auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .blog-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 200px 1fr 300px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                height: auto;
+            }
+
+            .sidebar {
+                flex-direction: row;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .stats-card {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .stats-number {
+                font-size: 2.5rem;
+                margin-bottom: 0;
+            }
+
+            .stats-icon {
+                margin: 0;
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                gap: 15px;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .main-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar - Total Posts -->
+        <div class="sidebar">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <svg width="30" height="30" fill="white" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                </div>
+                <div class="stats-number" id="totalPosts">24</div>
+                <div class="stats-label">Total Posts</div>
+            </div>
+        </div>
+
+        <!-- Main Content - Posts Display -->
+        <div class="main-content">
+            <div class="main-header">
+                <h1>Latest Blog Posts</h1>
+                <p>Discover amazing content and stories</p>
+            </div>
+            
+            <div class="posts-grid" id="postsContainer">
+                <div class="post-card">
+                    <h3 class="post-title">Getting Started with Modern Web Development</h3>
+                    <div class="post-meta">
+                        <span>By John Doe</span>
+                        <span>March 15, 2024</span>
+                    </div>
+                    <p class="post-excerpt">
+                        Learn the fundamentals of modern web development including HTML5, CSS3, and JavaScript ES6+. This comprehensive guide covers everything you need to know to start your journey...
+                    </p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+
+                <div class="post-card">
+                    <h3 class="post-title">The Future of Artificial Intelligence</h3>
+                    <div class="post-meta">
+                        <span>By Jane Smith</span>
+                        <span>March 12, 2024</span>
+                    </div>
+                    <p class="post-excerpt">
+                        Exploring the latest trends and developments in AI technology. From machine learning to neural networks, discover what the future holds for artificial intelligence...
+                    </p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+
+                <div class="post-card">
+                    <h3 class="post-title">Responsive Design Best Practices</h3>
+                    <div class="post-meta">
+                        <span>By Mike Johnson</span>
+                        <span>March 10, 2024</span>
+                    </div>
+                    <p class="post-excerpt">
+                        Master the art of creating responsive websites that work perfectly on all devices. Learn about mobile-first design, flexbox, grid systems, and media queries...
+                    </p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+
+                <div class="post-card">
+                    <h3 class="post-title">Database Optimization Techniques</h3>
+                    <div class="post-meta">
+                        <span>By Sarah Wilson</span>
+                        <span>March 8, 2024</span>
+                    </div>
+                    <p class="post-excerpt">
+                        Improve your database performance with these proven optimization techniques. Cover indexing strategies, query optimization, and database design patterns...
+                    </p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Section -->
+        <div class="form-section">
+            <div class="form-header">
+                <h2>Create New Post</h2>
+                <p>Share your thoughts with the world</p>
+            </div>
+            
+            <form class="blog-form" id="blogForm">
+                <div class="form-group">
+                    <label for="postTitle">Post Title</label>
+                    <input type="text" id="postTitle" name="postTitle" placeholder="Enter post title..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="postAuthor">Author</label>
+                    <input type="text" id="postAuthor" name="postAuthor" placeholder="Your name..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="postCategory">Category</label>
+                    <select id="postCategory" name="postCategory" required>
+                        <option value="">Select category...</option>
+                        <option value="technology">Technology</option>
+                        <option value="design">Design</option>
+                        <option value="programming">Programming</option>
+                        <option value="business">Business</option>
+                        <option value="lifestyle">Lifestyle</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="postExcerpt">Excerpt</label>
+                    <textarea id="postExcerpt" name="postExcerpt" placeholder="Brief description of your post..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="postContent">Content</label>
+                    <textarea id="postContent" name="postContent" placeholder="Write your blog post content here..." rows="8" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="postTags">Tags</label>
+                    <input type="text" id="postTags" name="postTags" placeholder="comma, separated, tags">
+                </div>
+
+                <button type="submit" class="submit-btn">Publish Post</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let posts = [
+            {
+                title: "Getting Started with Modern Web Development",
+                author: "John Doe",
+                date: "March 15, 2024",
+                excerpt: "Learn the fundamentals of modern web development including HTML5, CSS3, and JavaScript ES6+. This comprehensive guide covers everything you need to know to start your journey...",
+                category: "technology"
+            },
+            {
+                title: "The Future of Artificial Intelligence",
+                author: "Jane Smith",
+                date: "March 12, 2024",
+                excerpt: "Exploring the latest trends and developments in AI technology. From machine learning to neural networks, discover what the future holds for artificial intelligence...",
+                category: "technology"
+            },
+            {
+                title: "Responsive Design Best Practices",
+                author: "Mike Johnson",
+                date: "March 10, 2024",
+                excerpt: "Master the art of creating responsive websites that work perfectly on all devices. Learn about mobile-first design, flexbox, grid systems, and media queries...",
+                category: "design"
+            },
+            {
+                title: "Database Optimization Techniques",
+                author: "Sarah Wilson",
+                date: "March 8, 2024",
+                excerpt: "Improve your database performance with these proven optimization techniques. Cover indexing strategies, query optimization, and database design patterns...",
+                category: "programming"
+            }
+        ];
+
+        function updatePostCount() {
+            document.getElementById('totalPosts').textContent = posts.length;
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = posts.map(post => `
+                <div class="post-card">
+                    <h3 class="post-title">${post.title}</h3>
+                    <div class="post-meta">
+                        <span>By ${post.author}</span>
+                        <span>${post.date}</span>
+                    </div>
+                    <p class="post-excerpt">${post.excerpt}</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+            `).join('');
+        }
+
+        function addNewPost(postData) {
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const newPost = {
+                title: postData.title,
+                author: postData.author,
+                date: currentDate,
+                excerpt: postData.excerpt,
+                category: postData.category
+            };
+
+            posts.unshift(newPost);
+            updatePostCount();
+            renderPosts();
+        }
+
+        document.getElementById('blogForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const postData = {
+                title: formData.get('postTitle'),
+                author: formData.get('postAuthor'),
+                excerpt: formData.get('postExcerpt'),
+                content: formData.get('postContent'),
+                category: formData.get('postCategory'),
+                tags: formData.get('postTags')
+            };
+
+            if (postData.title && postData.author && postData.excerpt && postData.content) {
+                addNewPost(postData);
+                e.target.reset();
+                
+                // Success animation
+                const submitBtn = document.querySelector('.submit-btn');
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                submitBtn.textContent = 'Published!';
+                
+                setTimeout(() => {
+                    submitBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                    submitBtn.textContent = 'Publish Post';
+                }, 2000);
+            }
+        });
+
+        // Initialize
+        updatePostCount();
+    </script>
+</body>
+</html>
