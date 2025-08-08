@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .input-section {
+            padding: 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .todo-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .add-button {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+
+        .todos-container {
+            padding: 0 24px 24px 24px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+
+        .todo-item:hover {
+            background: #fafafa;
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            margin-right: 16px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .todo-checkbox.completed {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .todo-checkbox.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+            color: #111827;
+            transition: all 0.2s ease;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .delete-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            opacity: 0;
+        }
+
+        .todo-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+
+        .stats {
+            padding: 16px 24px;
+            background: #f9fafb;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-text {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: #fee2e2;
+        }
+
+        @media (max-width: 640px) {
+            .app-container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+
+            .add-button {
+                width: 100%;
+            }
+
+            .filters {
+                flex-wrap: wrap;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+           loadtodos();
+           allcounts();
+        });
+      async function checkuncheck(id,status){
+           const todoid = id.replace("chk","")
+           if(status == '0'){
+                $("#"+id).addClass('completed');                
+                try {
+                 const payload = {
+                    id : todoid,
+                    status : 1
+                }
+                const response = await fetch('http://localhost:800/updatetodos',{
+                    method : 'POST',
+                    headers : {
+                        'content-type' : 'application/json'
+                    },
+                    body : JSON.stringify(payload)
+                });
+            const result = await response.json();
+             Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Success!',
+                text: 'Todo Updated !',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f0f9f0',
+                iconColor: '#28a745',
+                customClass: {
+                    popup: 'success-toast'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            loadtodos();
+            allcounts();
+           } catch (error) {
+                    Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fdf2f2',
+                    iconColor: '#dc3545',
+                    customClass: {
+                        popup: 'error-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+           }
+           }
+           else
+           {                
+                try {
+                 const payload = {
+                    id : todoid,
+                    status : 0
+                }
+                const response = await fetch('http://localhost:800/updatetodos',{
+                    method : 'POST',
+                    headers : {
+                        'content-type' : 'application/json'
+                    },
+                    body : JSON.stringify(payload)
+                });
+            const result = await response.json();
+             Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Success!',
+                text: 'Todo Updated !',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f0f9f0',
+                iconColor: '#28a745',
+                customClass: {
+                    popup: 'success-toast'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            $("#"+id).removeClass('completed');
+            loadtodos();            
+            allcounts();
+           } catch (error) {
+                    Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fdf2f2',
+                    iconColor: '#dc3545',
+                    customClass: {
+                        popup: 'error-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+           }
+
+           }
+        }
+      async function loadtodos(){
+           const response = await fetch('http://localhost:800/all-todo');
+           const data = await response.json();
+           const todosdata = data.Data;
+           let htmlcode = ``;
+           todosdata.forEach(element => {
+                console.log(element.id);  
+                htmlcode += `
+                <div class="todo-item">
+                    <div class="todo-checkbox ${element.status == '1' ? 'completed' : ''}" 
+                        onclick="checkuncheck('chk${element.id}','${element.status}')" 
+                        id="chk${element.id}">
+                    </div>
+                    <div class="todo-text ${element.status == '1' ? 'completed' : ''}"" id="chk${element.id}">${element.title}</div>
+                    <button class="delete-btn" onclick="Deletetodo(${element.id})">×</button>
+                </div>
+                `;          
+           });
+           console.log(htmlcode);
+           
+           document.getElementById("todolist").innerHTML = htmlcode;
+        } 
+        
+        async function allcounts(){
+            
+           const response = await fetch('http://localhost:800/all-todo-counts');
+           const data = await response.json();
+           const Totaltask = data.Data[0].Totaltask;
+           const Completedtask = data.Data[0].Completedtask;
+           let htmltext = `${Totaltask} tasks ${Completedtask} Completed`;
+           // 6 tasks, 2 completed
+           $("#countspan").text(htmltext);
+
+        } 
+        
+        async function Deletetodo(todoid) {
+            try {
+                 const payload = {
+                    id : todoid
+                }
+                const response = await fetch('http://localhost:800/deletetodos',{
+                    method : 'POST',
+                    headers : {
+                        'content-type' : 'application/json'
+                    },
+                    body : JSON.stringify(payload)
+                });
+            const result = await response.json();
+             Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Success!',
+                text: 'Todo Deleted !',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f0f9f0',
+                iconColor: '#28a745',
+                customClass: {
+                    popup: 'success-toast'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            loadtodos();            
+            allcounts();
+           } catch (error) {
+                    Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fdf2f2',
+                    iconColor: '#dc3545',
+                    customClass: {
+                        popup: 'error-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+           }
+
+        }
+   </script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>My Tasks</h1>
+            <p>Stay organized and productive</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-container">
+                <input type="text" id="todotitle" class="todo-input" placeholder="Add a new task..." value="">
+                <button class="add-button" onclick="savetodoapp()">Add Task</button>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Active</button>
+                <button class="filter-btn">Completed</button>
+            </div>
+        </div>
+
+        <div class="todos-container">
+            <div id="todolist">
+
+            </div>
+                       
+        </div>
+
+        <div class="stats">
+            <span class="stats-text" id="countspan"></span>
+            <button class="clear-btn">Clear completed</button>
+        </div>
+    </div>
+
+    <script>
+        async function savetodoapp(){
+            const todotile = document.getElementById("todotitle").value; 
+            if(!todotile || todotile==null)
+            {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: "todo title",
+                    text: "todod title required !",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fdf2f2',
+                    iconColor: '#dc3545'
+                });
+                return;
+            }  
+           try {
+                 const payload = {
+                    title : $("#todotitle").val()
+                }
+                const response = await fetch('http://localhost:800/addtodos',{
+                    method : 'POST',
+                    headers : {
+                        'content-type' : 'application/json'
+                    },
+                    body : JSON.stringify(payload)
+                });
+            const result = await response.json();
+             Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Success!',
+                text: 'Todo Created !',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f0f9f0',
+                iconColor: '#28a745',
+                customClass: {
+                    popup: 'success-toast'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            loadtodos();
+            allcounts();
+            $("#todotitle").val("")
+           } catch (error) {
+                    Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fdf2f2',
+                    iconColor: '#dc3545',
+                    customClass: {
+                        popup: 'error-toast'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+           }
+
+        }
+        // Simple checkbox toggle for design demonstration
+        document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                const todoItem = this.closest('.todo-item');
+                const todoText = todoItem.querySelector('.todo-text');
+                
+                this.classList.toggle('completed');
+                todoText.classList.toggle('completed');
+                
+                // Update stats after toggle
+                updateStats();
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const filter = this.textContent.toLowerCase();
+                const todoItems = document.querySelectorAll('.todo-item');
+                
+                todoItems.forEach(item => {
+                    const isCompleted = item.querySelector('.todo-checkbox').classList.contains('completed');
+                    
+                    if (filter === 'all') {
+                        item.style.display = 'flex';
+                    } else if (filter === 'active' && !isCompleted) {
+                        item.style.display = 'flex';
+                    } else if (filter === 'completed' && isCompleted) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Update stats
+        function updateStats() {
+            const totalTasks = document.querySelectorAll('.todo-item').length;
+            const completedTasks = document.querySelectorAll('.todo-checkbox.completed').length;
+            const activeTasks = totalTasks - completedTasks;
+            
+            const statsText = document.querySelector('.stats-text');
+            statsText.textContent = `${totalTasks} tasks, ${completedTasks} completed`;
+        }
+
+        // Clear completed functionality
+        document.querySelector('.clear-btn').addEventListener('click', function() {
+            const completedItems = document.querySelectorAll('.todo-item .todo-checkbox.completed');
+            completedItems.forEach(checkbox => {
+                checkbox.closest('.todo-item').remove();
+            });
+            updateStats();
+        });
+
+        // Initialize stats
+        updateStats();
+    </script>
+</body>
+</html>
