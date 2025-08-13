@@ -29,14 +29,10 @@ return res.status(200).json({access_token : token})
 });
 
 app.get('/Get-details',authenticateToken,(req,res)=>{
-    console.log("res",res);
-    
     res.send(200,{messege : "data"})
 });
 function checkRole(allowedRoles) {
   return (req, res, next) => {
-    console.log("req",req.users);
-    
     if (!allowedRoles.includes(req.users.roles)) {
       return res.status(403).json({ message: 'You do not have permission' });
     }
@@ -49,7 +45,11 @@ app.get('/users-list',authenticateToken,checkRole(['Admin']),(req,res)=>{
 })
 
 app.get('/users-lists',authenticateToken,checkRole(['Admin','User']),(req,res)=>{
-    return res.status(200).json({messege : 'Admin and user both of Acess'})
+    try {
+      return res.status(200).json({messege : 'Admin and user both of Acess'})
+    } catch (error) {
+      return res.status(401).json({messege : error})
+    }
 })
 
 app.listen(Port,()=>{console.log(`Server started ! ${Port}`);

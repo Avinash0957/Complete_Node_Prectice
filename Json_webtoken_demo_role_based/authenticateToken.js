@@ -11,11 +11,12 @@ async function authenticateToken(req, res, next) {
     try {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         req.users = decodedToken;
-        console.log("decoded",decodedToken);
         next();
     } catch (error) {
-        console.log(error);
-        
+        if (error.name === "TokenExpiredError") {            
+           return res.status(401).json( {msg :'token expired'})
+        }
+
     }
 }
 
