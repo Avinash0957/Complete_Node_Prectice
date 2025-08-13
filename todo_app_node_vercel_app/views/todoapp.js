@@ -233,7 +233,6 @@
            try {
                  const payload = {
                     title : $("#todotitle").val()
-                    
                 }
                 const response = await fetch(`${window.location.origin}/addtodos`,{
                     method : 'POST',
